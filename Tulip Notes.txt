@@ -1,0 +1,2232 @@
+ Tulip Notes
+
+05/24/17 -
+
+Goals:
+Increase knowledge of stack
+Fix button feature
+Refactor button code w/ editable text.
+
+How do I run front end node debugger?
+Use the chrome inspector and set breakpoints
+
+
+Where is the front end server being entered?
+
+How do I find the corresponding code assosciated with a UI element/behavior?
+Find name of element’s class in w/ chrome -> inspect element
+Search for that class (Control + P) in sublime.
+Find Assosciated JS file
+Copy a unique section of the js code and search for it in chrome inspector > console > build > bundle.js
+
+What is tracker?
+https://docs.meteor.com/api/tracker.html
+Tells meteor when to reload object when dependencies change.
+
+What is tracker.flush?
+Forces all pending reactive updates to complete
+
+What is going on with $('[data-editable-value]')? I know it’s a Jquery selection, but why is it in brackets
+
+
+
+What is with this syntax: 'click [data-editable-save], blur [data-editable-value]'
+
+There is a react editable text in common-ui > client > react > EditableText
+Did not use because it seemed like it was meant for stuff on the sidebar. It has check and minus buttons, stuff that I may not want.
+
+Why did I change to having an EditableTextFormatable inside Button?
+Easier to implement I think
+I have the old changes stashed
+
+What is a DOM Tag?
+    It is <This_thing></this_thing>. The stuff immediately to the right of the first opening bracket.
+
+Where does EditableTextFormattable get its ‘on’ methods?
+
+How do I add onClick to props?
+
+Does onClick need paramaters, and is there any way to find out if it does?
+
+
+Buttons have a secret blocker in front of them.
+To change this go to imports/widget-definitions/common/button.js and set editor interaction to true
+
+How does scss work?
+
+
+
+05/25/17 -
+
+Lowercase jsx tags are html elements, PascalCase tags are React Components
+
+&& Short Circuiting -
+    Syntax: <expression1 > && <expression2 >
+    Returns the first falsy value. Is a way of gaurding things such that expression 2 is only returned if expression 1 is not falsy.
+
+|| Short Circuiting -
+    Syntax <expression1 > || <expression2 >
+    Returns the first truthy expression.
+
+Search -
+    Ctrl + Shift + F is for powerful searching
+    Where clause allows you to:
+        Prefix regex with - to ignore it
+        * is a wild card
+        Example: -*.test.* excludes all tests
+        Commas add aditional rules
+        Example: -*.test.*, -*.jest.* excludes both
+        Including folder name allows you to search that folder
+        Example: analytics-editor/ only searches within the analytics-editor folder
+    After doing search, double clicking on a boxed item (usually the search term) goes to tat file.
+
+Where is the button text info from teh dataBase propogated to the button?
+    Step_renderer > client > templates
+    It’s passed in one of the destructured arrays, so it’s not going to be called explicitly.
+
+Where are widgets coming from?
+They come from widget collection (which is a mongo collection)
+We do a select on the widget collection
+
+Step Record in our DB:
+
+Step:
+    Id
+    Widgets
+Widgets:
+    Type
+    Top
+    Left
+    Width
+    Height
+    backgroundColor
+    …
+    Text ←(only button and paragraph have this)
+
+
+Utils.decorator is a reducer that takes a list of functional components and wraps each lower component along the way with different props.
+
+ES6 Object destructuring -
+    Const {data: {WidgetComponentSet}, widgetRecord} = template.instance()
+
+    Is equivalent to
+
+    Const WidgetComponentSet = template.instance().data.WidgetComponentSet()
+    Const WidgetRecord = template.instance().widgetRecord
+
+Goals:
+Commit the button editing code
+Make it so master buttons cannot be edited
+Enter button press save button (DONE)
+Button input text is centered (DONE)
+Change styling of the input to be more obvious (DONE)
+Make button able to be dragged.
+Fix unit tests.
+Add unit tests.
+Make it so that click inside textarea doesn’t exit button.
+
+
+
+05/26/17 -
+
+Goals:
+Commit the button editing code
+Make it so master buttons cannot be edited
+Make button able to be dragged. (DONE)
+Fix unit tests. (DONE)
+Add unit tests.
+Make it so that click inside textarea doesn’t exit button. (DONE)
+
+Where I’m at -
+I got the button dragging to work. In taking out the canDoubleClick property from my button (since it’s no longer necessary), I broke some unit tests. The next step is to figure out why those tests broke.
+
+Git log: show a list of recent commits
+Git stash: stash all the changes in your current repo
+Git stash pop: get those changes back
+Git checkout <SHA key>: go back to that commit.
+Git checkout <branchName>: to go the head of that branch
+
+
+
+05/27/17 -
+
+Goals:
+Commit the button editing code
+Make sublime editor environment better
+Make it so master buttons cannot be edited (except when in a master layout pane) (DONE
+Fix unit tests, AGAIN. (DONE)
+Add unit tests.
+
+Shallow renderer renders stuff one level deep
+https://www.npmjs.com/package/react-test-renderer
+
+
+Jest 15 doesn’t automock everything
+https://facebook.github.io/jest/blog/2016/09/01/jest-15.html
+
+But we set automocks to true anyways
+
+what do package.json dependency symbols mean ?
+    Example: “babel-jest”: “^14.1.0”
+    Major version.minor version.patch version
+    Major version has breaking changes
+    Minor version introduces new functionality but is non-breaking
+    Patch version is bug fixes and such
+    ^ means it will upgrade all nonbreaking changes, so 14.x.x
+
+How do I create a shallow renderer in the non-deprecated manner?
+It seems like new ReactShallowRenderer() is returning a null
+Actually, it’s not. It just has an instance property of undefined before its.render(method) is called.
+
+How do I only stash specified files?
+    Git stash -p enters into a mode where you can choose what you want to stash
+
+WHat is require(‘/filename’).default do?
+    Gets the default export I believe
+
+How does automocking work?
+    http://thewebivore.com/jest-facebook-automagical-mocking-tests-youre-sort-thing/
+    Makes all dependencies stubs
+How does automocking interact with react?
+
+With fatal change, shallowRenderer.getRendererOuput() prints
+    { '$$typeof': Symbol(react.element),
+      type: 'div',
+      key: null,
+      ref: null,
+      props:
+       { className: 'test-class-name-1236',
+         children: [ [Object], [Object] ] },
+      _owner: null,
+      _store: {} }
+
+Without fatal change:
+
+    { '$$typeof': Symbol(react.element),
+      type:
+       { [Function: Button]
+         DEFAULT_COLOR: '#3B99FC',
+         propTypes:
+          { _id: [Function: bound checkType],
+            color: [Object],
+            leftIconClass: [Object],
+            rightIconClass: [Object],
+            children: [Object],
+            borderWidth: [Object],
+            borderStyle: [Object],
+            borderColor: [Object],
+            fontSize: [Object],
+            fontColor: [Object],
+            fontUnderline: [Object],
+            fontItalicize: [Object],
+            fontBold: [Object],
+            onClick: [Object],
+            onDoubleClick: [Object] } },
+      key: null,
+      ref: null,
+      props:
+       { _id: '1',
+         shouldShowMoveCursor: false,
+         isValuePlaceholder: true,
+         onSave: [Function: stubTrue],
+         onChange: [Function: noop],
+         onIsEditing: [Function: noop],
+         onIsNotEditing: [Function: noop],
+         initialValue: '',
+         borderWidth: '0px',
+         borderColor: 'transparent',
+         borderStyle: 'none',
+         onDoubleClick: [Function: bound handleDoubleClick],
+         children: 'Add Text...' },
+      _owner: null,
+      _store: {} }
+
+The issue was that were accessing the child, not the button
+
+
+Why does blockerEl = TestUtils.findRenderedDOMComponentWithClass(
+          editableButton,
+          'test-class-blocker'
+        );
+Not work?
+
+Where I’m at - I’d like to add some unit tests to verify the functionality that I’ve built, but I’m not sure how to do it in a way that’s not brittle. I was able to implement the master locking, however right now it is being done inside of the base EditableButton component rather than in a blaze template higher up. The tests are broken because right now the react component relies on the stepId prop and communicating with the meteor database in order to figure out if it can be edited. This makes testing hard, because it requires a mocked out database. I would like to pass in a canModify prop
+
+
+05/28/17 -
+
+How do meteor templates work?
+https://www.meteor.com/tutorials/blaze/templates
+https://docs.meteor.com/v1.3.5/api/templates.html
+
+Body.html -
+<template name="task">
+ <li>{{text}}</li>
+</template>
+Body.js -
+Template.body.helpers({
+ tasks: [
+   { text: 'This is task 1' },
+   { text: 'This is task 2' },
+   { text: 'This is task 3' },
+ ],
+});
+
+<template name="foo"> ... </template> can be references as Template.foo in JS
+
+Template.myTemplate.helpers({
+  foo() {
+    return Session.get("foo");
+  }
+});
+
+You can invoke this helper with {% raw %}{{foo}}{% endraw %} in the template defined with <template name="myTemplate">.
+
+What is widget component set?
+
+
+
+
+
+How do I add changes to my last commit?
+https://blog.codeminer42.com/git-basics-adding-more-changes-to-your-last-commit-1629344cb9a8
+
+Git add <changedfile.asdf>
+Git commit --amend
+
+How do I merge two past commits?
+https://stackoverflow.com/questions/12522565/how-can-i-combine-two-commits-into-one-commit
+
+How do we get tests to run faster?
+
+I changed
+
+"testPathDirs": [
+        "<rootDir>/imports"
+    ],
+
+To
+
+"testPathDirs": [
+        "<rootDir>/client",
+        "<rootDir>/server",
+        "<rootDir>/imports"
+    ],
+
+
+So it wouldn’t search extra places for tests.
+
+What is `tty`?
+Test if it’s interactive
+
+What is $1?
+    First positional argument to shell script
+
+What is 2>&1?
+    Pipe standard error to standard out
+    2 is std error
+    1 is std out
+    & means ‘file description’ when it comes after a redirection
+https://stackoverflow.com/questions/818255/in-the-shell-what-does-21-mean
+
+
+Higher order components -
+    https://www.youtube.com/watch?v=LTunyI2Oyzw&t=330s
+    Const loaderHOC = (propName, WrappedComponent) =>
+        Return class
+
+React’s children API
+    React.Children.only(this.props.children) garuntees that a child is one component.
+    React.Children.count(this.props.children) is the # of children.
+    React.childeren.map(this.props.children, <a function of child>)
+    This.props.children is not an array!
+    React.Children.toArray(this.props.children) converts it to an array
+
+Import * as fromModule from ‘./myModule’;
+    This makes every function in myModule available as fromModule.function()
+
+THe spread operator is importand because it allows you to do operations without mutating your arrays.
+    Var myarray = [‘a’, ‘b’, ‘c’, ‘d’]
+    Var otherarray = myarray.append(‘e’) - this mutates myarray
+    Var otherarray = [...myarray, ‘e’] - this does not mutate myarray
+    .slice also does not mutate
+    Var otherarray = [...myarray.slice(0,1), ‘aa’, ...myarray.slice(2)]
+                    = [‘a’, ‘aa’, ‘b’, ‘c’, ‘d’]
+
+
+q
+05/30/17 -
+
+Git diff <sha>..
+    Implicitly compares to head
+
+Git diff <sha>.. --stat
+    Lets you see at a high level which files hav echanged
+
+Git fetch downloads everything on origin, but doesn’t make branches?
+
+Git checkout -
+Goes to last branch you were on
+
+Screen -
+A0 q to quit
+Screen -ls shows all screen instances
+Screen -r <instance_name> rejoins that instances
+
+Deleting variables ticket-
+Copy lives in StepEditorActions
+Remove delete from copy and move to paste
+Have delete only when you are pasting it into a different process
+What thing hold whether a variable is in a process?
+Two type s of vars: magic and nonmagic
+Magic variables are autocreated (timeElapsed on step, currentUser)
+The other ones are user created
+Check if variable is non- magic variable
+If process id is same of one you are pasting, then it’s okay.
+Widgets.findOne(<widget_id>).
+You can use Variables.find(<variable_id>) to query the variables
+    2. If it’s a magic variable
+If variable is stepTimes and we cannot find the step Id in the current process then delete it.
+Subfield of stepTimes is the step id.
+Besides that, it’s fine.
+
+In mongo shell-
+ db.Widgets.find({type:"variable"}) finds all current widgets
+
+What is replaces master?
+What is copiedWidget.lock_to?
+
+Why are we assigning the copiedWidget.widget_version_set to a random id?
+
+What is as widget version set?
+
+How do I see all mongo db collections?
+environments/cloud/Central/factory/imports/step-editor-core/client/StepEditorActions.js  in mongo shell type: show collections
+
+Is subfield optional?
+
+
+
+05/31/17 -
+
+
+Goals:
+Finish variable deletion ticket
+Finish item copying ticket
+Refactor copying and pasting tests to be faster?
+Get sublime working better
+Diagnose internet issue
+
+To use the magic variables api
+
+Help mocking modules in jest -
+https://stackoverflow.com/questions/40465047/how-can-i-mock-an-es6-module-import-using-jest
+
+Got the tests all working individually and code nice and pretty - for some reason when I run the tests all together it does not work. I think it has to do with how I’m mocking jest functions.
+
+
+I’m starting to work on a new project - it has to do with an issue that Mark and Pablo encountered from newbalance where their analytics was showing stuff from sunday, not the last working day. I want to make sure we are designing for an actual use case here.
+06/01/17 -
+
+Goals:
+Finish variable deletion ticket
+Finish item copying ticket
+Refactor copying and pasting tests to be faster?
+Get sublime working better
+Diagnose internet issue
+
+
+My Jest tests are failing when I run them en masse, but if I import packages individually it’s fine. Why is this?
+Probably due to the fact that I am importing shared modules at the top that may have state.
+It is common practice to import all your shared modules in the ‘BeforeEach’ statement before each test. This will reload them automatically.
+
+I am calling MagicVariables.isMagicVariable = jest.fn().mockReturnValue(true), but when I call isMagicVariable in the code, it returns false. How do I mock individual functions of a module?
+I think I need to mock the entire module using jest.mock(‘<moduleName>’, () => mockedIMplementationofModule)
+
+jest.mock(moduleName) mocks out a module so that every call to it is a mocked version.
+Jest.mock does not bring the module into our namespace. If we want to edit it in a test we need to require it in our file.
+
+I was having an issue where my mocked MagicVariables module returned functions that returned functions instead of functions that return constants. To fix this, I set the mock of each thing to be the return value, instead of a function that returned that value.
+
+Arc diff <= submit a phab ticket for pushing changes to master
+Arc diff --update
+
+When starting to address a ticket that will depend on our previous changes/could intersect with changes that are currently being
+
+What is the best way to make revisions to an arc diff?
+Just change stuff around in your branch and arc diff it again. Don’t need to do anything in phab.
+
+
+
+Better Pasting -
+AddWidgetToCenter handles the offsetting of widgets
+What does fractionalToRelativePosition do?
+    Returns a percentage indicating how high you are on the screen
+
+What is electron?
+
+
+
+06/02/17 -
+
+Ctrl + KK in Sublime - Deletes everything from cursor to end of line
+
+Can we think of a better name for apply paste?
+
+Ctrl + backspace deltes entire words at a time
+Fn + left/right moves to beginning/ end of line
+
+Alt + minus goes to last cursor position
+
+How do I make a sublimetext macro?
+
+Goals:
+Resolve code review
+Talk to amir
+
+How do I the step/process of a widget?
+
+What does the subfield of a widget mean? Maybe its referencing the id of the step
+
+Version is like what version it is
+Each widget has its own version set
+
+Where I’m at - Trying to make the variable copying logic for currentSteps work. I need to get the current version set of the current steps and compare them to the current version step being stored in the arg of the magic variable.
+
+
+
+06/04/17 -
+
+Looked into flatpac and snap - seems like flatpac is winning the race but it’s hard to say for sure. Form my understanding, they are trying to solve the problem of creating programs that “just work” on different linux flavors without any extra work. Also they update quickly. How exactly does that fit into what we are trying to do? Would we be using something like this for all the linux that we support?
+
+How do we flexibly handle setting up language runtimes for every single language in existance? Or felxibly enough that it can automatically add in any language runtime we want?
+
+Protobuff seems exactly what we’re trying to do, except we want to use zmq messages -
+https://developers.google.com/protocol-buffers/docs/pythontutorial
+
+https://developers.google.com/protocol-buffers/docs/reference/python-generated
+
+
+Protocol Buffers -
+A way to represent any kind of data formet in a language agnostic format
+Can dynamically generate apis from several different languages
+Can be used to generate gRPC messages or other rpc messages
+
+What is gRPC?
+
+What is a greenlet?
+Like a thread but not parallel?
+https://stackoverflow.com/questions/15556718/greenlet-vs-threads
+
+Why are we using zmq? Does it do the same thing as grpc?
+
+How does zmq work?
+http://blog.pythonisito.com/2012/08/distributed-systems-with-zeromq.html
+It’s kind of like connecting to a port, with a few twists
+You can specify the “type” of the socket you want to connect to. Only sockets with the right “type” can match up.
+Request/Reply
+A basic client/server connection. The client send and gets data back from ther server. The server gets and then sends back messages to the client.
+Publisher/Subscriber
+A publisher sends out data to a specific location
+As many subscribers as wanted can subscribe to that location
+Subscribers can subscribe to many different publishers at teh same time.
+Publishers cant do any recieving (unlike replies)
+Subscribers cant send any information (unlie requests)
+Push/Pull
+Whats teh deal with zmq.Context() vs zmq.Context.instance()
+What is a URI?
+Basically a url
+
+What does the ampersand do?
+http://bashitout.com/2013/05/18/Ampersands-on-the-command-line.html
+Spawns off the command in a seperate process
+Tells you the process id right under it
+Binds that process id to teh ! sign. To see what the process id is you can type “echo $!”
+jobs <- tells you all the background processes going on (only if you’re still in the same shell)
+Kill %jobid kills the job
+
+What design parameters has made us decide to use microservices?
+https://martinfowler.com/bliki/MicroservicePremium.html
+https://martinfowler.com/articles/microservice-trade-offs.html
+
+
+
+ 06/05/17 -
+
+How do I print a javascript object better? Right now it only shows [Object object], but I want all its fields.
+JSON.stringify(stepOrGroup, null, 2)
+
+Getting this weird type error in my tests:
+    TypeError: (0 , (_shouldClearPastedVar || _load_shouldClearPastedVar(...)).default) is not a function
+ANSWER: I was doing jest.mock(‘./shouldClearPastedVar’, () => mockShouldClearPastedVar);
+Where mockShouldClearPastedVar was undefined or true or false, not a jest function.
+
+How do I undo a commit
+git reset HEAD^
+
+
+
+ 06/06/17 -
+
+Refactoring Blaze to React -
+    -https://www.youtube.com/watch?v=gkcT7jsXR1E
+    - https://guide.meteor.com/react.html
+
+
+
+How does index.js reference template.html in its code?
+
+name props from the component's own point of view rather than the context in which it is being used.
+
+I don’t like my naming convention right now
+
+How should I test?
+
+What does {{> mean in meteor?
+
+Adding propTypes to functional componenets:
+
+import React, { PropTypes } from 'react'
+
+export default function Foo ({ bar }) {
+  return (
+    <div className='Foo'>
+      Foo is {bar}
+    </div>
+  )
+}
+
+Foo.propTypes = {
+  bar: PropTypes.string.isRequired
+}
+
+WHy does my component render incorrectly when inside a div?
+
+I can see 2 reasons for why it might be broken:
+1) div is a block element, so it will be on a new line. can make it a non-block element by using something like a span or adding a class to the div
+2) there's a poorly written css selector that isn't triggering anymore
+Changing div to span doesn’t seem to help, so I think it’s the second option. That leaves me with the question, how do I write the css selector correctly?
+I think the css selector is written correctly, but flexbox is having an issue
+Either the div is swallowing the flexbox properties of the child
+Or maybe div is adding extra space causing it to wrap?
+
+
+How does flexbox work?
+http://www.sketchingwithcss.com/samplechapter/
+If an element is a flex container, it’s children follow flexbox rules for layout
+Flex container children line up on the “main axis”, which can be either horizontal or vertical
+Display: webkit-flex sets the item to be a flexbox container
+Webkit-flex-flow sets direection of main axis
+Row is default
+Column is for flipped
+Row wrap wraps the row
+Column wrap wraps the column
+Webkit-justify-content lets us move things around the main axis
+Flex-end: move to end of axis
+Flex-start: move to start of axis
+Center: move to center of axis
+Space-around: gives you even space between each element, and half that space at each end
+Space-between sticks things flush to the end and spaces evenly.
+Webkit-align-items: lets us move things around the cross axis
+Defaults to stretch
+Webkit-flex: <grow> <shrink> <basis>
+Webkit-flex-grow:
+Set to 0 by default
+How much does the element get bigger when its smaller than its default size?
+The ratio of how much it grows vs how much the page grows
+Webkit-flex-shrink:
+Set to 1 by default
+How much does the element get smaller when its smaller than its default size?
+The ratio of how much it shrinks vs how much the page shrinks
+Webkit-flex-basis:
+Set to auto by default
+Auto: Makes it so that items grow/shrink proportional to the spacing around the default size.
+0: items grow/shrink proportionally. An item with a grow of 3 will be 3 times the size of an item with a grow of 1.
+Margin-top: pins item to bottom of page
+Margin-left: pins item to right of page
+Webkit-align-content:
+Webkit-order: sets the order of each item
+Makes it so that the order doesn’t depend on the order in the html doc
+
+How do I find what template a template is referencing?
+Search all files for name=<templateName>
+
+
+
+ 06/08/17 -
+
+Working Schedules Meeting -
+Things I need to due by tuesday
+Define the Data model and API’s for calendars
+Look at other calendaring systems (matcek, SAP, epicore, oracle)
+Send sketch of other alternative to Mark
+
+Problems with Smart Scheduling -
+We don’t know what kind of “completions” are our tests
+If we shut down for a day, how do we deal with that?
+
+Mckinsey has their own better analytics engine -
+Changes should probably be made there
+In branch newbuilder.r88.2
+
+Where I’m at - Making changes to StepEditorCleintUtilsMisc.
+
+
+
+ 06/09/17 -
+
+WHat is the best way to do optional arguments in Javascript?
+https://gist.github.com/ericelliott/f3c2a53a1d4100539f71
+
+What’s the best way to debug a UI issue like focuses being possibly registered on every object?
+
+Will StepEditorCore.getCurrentStepId update when db changes are made if not in a container?
+
+Meteor.autoRUn is a function that relies on teh tracker package (a meteor internal thing)
+Imagine you set up one function that is a proxy for all your other functions
+Keep track of certain mutations that happen in functions that I invoke
+
+Is it like what react does when renderIng?
+Different algorithm but same effect
+
+An autorun is only ever rerun if it is only done in a reactive context, where you set up
+
+Create container takes a closure that lets you define the behaviour when a change happens
+
+When you want to go from meteor state into react state use create container
+
+
+We want to split out presentational components and smart components
+Presentational Components -
+Say how stuff is showed
+Should only have react, lodash, classnames dependencies, MAYBE utils
+should never be dependent on the database
+Think about dom actions
+Smart COmponenets -
+Deal with logic and
+Thing about user intent
+Container event’s are on
+
+WHat is a reactive dependency?
+Imagine that there is a value that a function dpeends on. Every time you chagnes the value funciotion re-runs to
+
+How do stage deleted files on git?
+Git add -u .
+React managed inputs
+My input is not getting changes because the react.onChange function is not being called
+ 06/11/17 -
+
+Thoughts on scheduling:
+It feels like we’re being rushed into implementing a feature without doing the necessary design work ahead of time to figure out what that feature should look like. We don’t have a clear definition of a problem, instead we’ve been given a clear definition of a solution. Why are we being given a solution instead of a problem? Isn’t it our job, as designers and engineers, to come up with the solution. Plainly stated, I don’t understand why we have decided that a yearly calendar is the best solution to meet our customers needs. From what I have learned about so far, we have two use cases that we’re designing for:
+New Balance doesn’t want to see empty data when they use our metrics.
+OEE will require knowing time shifts.
+The issue I’m having is that neither of these explicitly requires yearly scheduling. So, why have we jumped straight to defining an idea? Where is the definition? Where is the ideation? What the heck? Why haven’t we been talking to customers to get their feedback on our ideas?
+
+I understand that this project is huge and to make it work we need to manage it into reasonable chunks, I’m just totally not getting why the chunk that we’ve picked is yearly scheduling, and I’m being pressured to create an implementation for it right away.
+
+I feel angry. What rules of mine are being broken? Probably that if I’m working on a project, I want to be onboard with the direction the project is heading. I also want to be considered when it comes to the project’s direction. I also want to do a good job. I don’t feel like either of those three things are going to be fulfilled with this project, because we’re rushing so quickly into defining implementation details, and my opinion doesn’t seem like it’s being listened to. All I’m trying to do is figure out why we’re making the decisions that we’ve made so far - namely that yearly scheduling is the best way to go.
+
+
+
+ 06/12/17 -
+
+Questions for Meeting with Mark -
+What are the external time factors that we are working under?
+For NB we need better displaying of data by august
+Are we set in stone on the calendar idea?
+
+
+Why haven’t we talked to more customers to get more feedback on the things that we’re building?
+Specifying a more clear path forward. It would be useful to have a very clear roadmap, with justifications from our user research, before we move forward on building it.
+There are many ways to test a feature - building it is one, but we can also show a customer a mock and get their feedback on that. Why have we decided that building is the best way to prototype?
+How do we know that the working day scheduling is clearly the best path forward, without having talked to customers?
+
+1.
+
+Magical Solution -
+Cons:
+Doesn’t help with OEE
+
+
+
+
+Why is the cursor being moved to the end of the file
+
+Only do ...props when it make sense (if it’s a abstract wrapper), not for wdigets
+
+THere’s two reactive dependencies basically around the stepOrStepGroup, one in react and one in blaze. They’re causing it to re-render the whole ocmpoent, losing the cursor.
+
+To get the latest code do:
+Git pull origin master
+
+We can’t use GNU or GPL
+
+How do we do efficient datetime lookups currently?
+
+How do I find the diff assosciated with a resolved ticked in phab?
+
+
+ 06/13/17 -
+
+Will STEP_NOMINAL_WIDTH always be equal to 1080? WIll that always be our relative unit?
+
+To DO:
+Look at stuff that Marcus sent me
+Look at stuff that Stephanie sent me
+Make code review changes DONE
+Sync with mark about call
+
+
+
+ 06/14/17 -
+
+Why do we not do nested schemas?
+
+Do we lose performance? Ex: a calendar can hold a list of events. It will be much quicker to iterate through events of a calendar, rather than finding all events with the same id.
+
+What operations do we want to support well for a calendar?
+
+
+How do we find out what customers are real about expanding Tulip? There’s probably a huge amount that just have us to show as part of some fancy research and development shpiel - my hypothesis is that these are the kinds of customers that we don’t want. We want customers who are going to implement us in production, not in their R&D group.
+If we asked each Tulip Champion: “If it was up to you, and you could flick a switch and all the company would be using Tulip, would you say yes?” What would they say?
+What if we just asked them “Do you love our product?”
+
+
+ 06/15/17 -
+
+New Balance Notes -
+We need to make it really obvious to users that you should only create a calendar for each set of processes that are supposed to run concurrently. This can be done with messages, or with good UI indications (maybe people might be averse to making a new ‘calendar’ for each value stream because of the connotations of the word calendar, but if we called it something else and represented it differently they would be more open to it)
+Having any notion of a partial open may be misleading. Ideally, a calendar only has full opens or full closes. If it needs a partial open, suggest creating a new calendar?
+
+
+How do we get people in the habit of runnign procesesses?
+What is the major barrier keeping process engineers from designing their own Tulip processes?
+Current problems with checklists/audits:
+Annoying/Hard to navigate between processes
+Having a reminder poup on the app would be great. We could click to navigate to the audit process. Saving progress on where you were and navigating you back to your last process would be necessary
+There are no phones allowed on the shopfloor and emails run too late, so we might need another notification solution.
+Dragging analytics suck
+While walking around the floor, we saw an operator (who was supposed to be using a new process), with the process closed. Turns out that the tablet had some small issue starting up. If operators have no incentive to turn on their processes, then the adoption at New Balance will be really rough. How do we get operators to have an impetus to use a process when they don’t actually get any value from it? (In the case of new balance the process is purely being used for analytics, so it’s not necessary to their workflow)
+
+To Do:
+Continue working on calendar task
+Close copyign multiple widgets phab ticket
+Create and do new phab ticket for making analytics viewer thingies easier to drag around.
+Work with mark to create a new product document to solve the following issues:
+How to get operators to use the processes?
+How to catch issues like this in the future. We should have a checklist when deploying to a new site, and one item should be making sure that they implement the solution from (a).
+
+Does webkit correspond to chrome?
+Also safari
+
+How do I search for a class name in Chrome inspector?
+
+
+What does $Action do in css?
+
+
+Detached just means you’re at a commit without any branch assosciated with it.
+
+Where I’m at -
+I’ve been debugging an issue I’m seeing with dragging of analytics. Basically, when I drag an item it’s going in the wrong place. I think it has to do with how i’m getting that item’s index. Look in index.js of masonryGridColumn.
+
+
+
+06/16/17 -
+
+What is the difference between $(ui.item) and ui.item?
+Ui item is an object
+What does a jquery selector on an object do?
+I believe it should return a jquery array-like object. Not sure what this is, but it allows you to call jquery methods on it at least.
+Why am I getting the following error: TypeError: Converting circular structure to JSON when I’m trying to use Json.stringify on ui.element?
+The object contains circular references, ie items that reference themselves, so it’s impossible to resolve the entire tree.
+
+What is ui.helper?
+    ‘ The jQuery object representing the helper being sorted’
+    https://forum.jquery.com/topic/draggable-helper-what-is-it
+    The helper is the item that actually gets dragged around. It can be either a clone of the original widget, or something else that you specify with the helper option
+
+What is ui.item?
+    ‘The jQuery object representing the current dragged element.’
+    I think this is the original element that we’re trying to move.
+
+Stop is when the placeholders and the transition items is finally deleted
+At receive the helper and transition item is still around
+
+Where I’m at -
+Got the the dragging between columns to work
+I’m trying to make it so that when i move the item, it doesnt flicker in its old position
+What i’m doing is not removing the item transitioning class until i re-render, however it only re-renders when I move columns. How do I make it re-render in the same columN?
+
+
+
+06/19/17 -
+
+Goals for today:
+Meet with sam to talk about his redux modal plugin, also learn what I would need to do to integrate a branch with redux
+Look over Mark’s code and integrate my side with it
+
+Git fetch pulls all of the remote branches
+
+Git pull fetches, and then fast forwards your local copies of those branches
+
+What is a remote?
+The upstream server
+Origin is a remote
+If you fork a repo, it will create a new remote
+
+
+Remotes in git have names
+
+Git checkout origin/markwatabe.proto…. Would make changes to the remote version
+Git checkout markwatabe.proto… makes changes to my own version.
+
+How does pushing to remote branch work?
+We don’t use arc, that just for pushing to the main codebase.
+
+How much can I change from the yearly calendar without it being too much.
+
+Yearly Calendar changes -
+Feels cluttered overall
+sans-Serif fonts over serif fonts?
+Increasing margins
+The calendarheader shouldn’t have scroll bars
+Make clear seperation between formatting and pure parts of code
+
+
+Questions for mark concerning calendar code -
+Utils:
+makeWeeks
+What does this function do in high level terms?
+105: what does subtracting by get day do?
+118: Why is this check here?
+119: Why are we checking if week.length is 7? Is it ever not 7?
+We push a new week to weeks once weeks is 7 long
+
+
+
+06/20/17 -
+
+Got this issue when trying to push a new branch:
+
+To git@github.com:tulip/tulip.git
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'git@github.com:tulip/tulip.git'
+hint: Updates were rejected because a pushed branch tip is behind its remote
+hint: counterpart. If you did not intend to push that branch, you may want to
+hint: specify branches to push or set the 'push.default' configuration variable
+hint: to 'simple', 'current' or 'upstream' to push only the current branch.
+
+Solution: I was typing ‘git push’ instead of ‘git push origin newBranchName’
+
+Installing new packages with npm didn’t changes my pacakge.json, causing other people’s builds to break.
+SolutIon: run npm install asdf --save install of npm install asdf. The --save file actually makes changes to the package.json file
+
+Where I’m at:
+Today I implemented basically ground framework for how the calendar backend is going to work. I’m fairly happy with how it works, and the way that I designed it. For the future, I need to fix the console errors I’m getting when I build. Once it builds correctly, I need to create a snapshot test with no items, and then I can edit the makeWeeks and makeMonths functions so that they can use the momentArray data structure instead of what it’s doing now. With tests, I won’t have to worry about things breaking.
+
+
+06/21/17 -
+
+Goals:
+Fix build errors with current version of working days
+Get snapshot tests/unit tests running
+Simplify makeweeks and makemonths code using momentArray data structure.
+
+
+How do I show data from files that I add, before I commit them?
+ANSWER: git diff --cached
+
+In sublime, how do I search only opened files?
+https://stackoverflow.com/questions/20519040/search-in-all-files-in-a-project-in-sublime-text-3
+
+
+Is there a good pattern for when you want to clone something at the beginning of a function, but don’t want to clog the namespace, and you also don’t want to override the initial parameter
+
+Call it dayArrayArg
+
+What I’m at -
+Was able to fix my build errors, get some tests up and running, and change makeWeeks to use the dayArray, as well as general code prettifying and renaming things to make more sense. Next things on my plate include changing makeMonths to also use the dayArray, and changing how I’m generating layouts for days. I should have another layoutBuilder function that takes a calendarItem and renders the appropriate react component.
+
+06/22/17 -
+
+How do I add staged changes to last commit?
+git commit --amend --no-edit
+
+
+06/23/17 -
+
+Goals:
+Finish moving javascript styling to css
+Remove badges from the months
+
+When pasting code/error messages in sack, use ``` on both sides to get good formatting
+
+How do I unstage git files?
+SOLUTION: git reset
+
+Killing jest:
+In screen -
+Ps -ef | grep jest
+jspear   19029 18341  0 11:14 pts/21   00:00:00 /bin/bash ./jest.sh
+jspear   19040 19030  0 11:14 pts/21   00:00:00 sh -c jest --config tests/jest/config.json --watch
+jspear   19041 19040  4 11:14 pts/21   00:04:45 node /home/jspear/Tulip/tulip/environments/cloud/Central/factory/node_modules/.bin/jest --config tests/jest/config.json --watch
+Kill -9 19029
+What does -9 do?
+It hard kills it. Doesn’t let the process do its own shutdown cleanup.
+What does ps -ef do?
+Ps is a command to show all processes
+-ef shows every process, and formats it in a specific way.
+
+
+
+06/26/17 -
+
+Goals:
+Finish moving javascript styling to css
+Add flowtypes and replace proptypes with flowtypes
+
+
+How do I see the size of all subdirectories in a folder?
+ANSER: du -d 1
+Du -d 1 -h -> makes it human readable
+du -hs * | sort -h sorts it
+-hs * acts like -d 1 except better (both only get direct subdirectories)
+
+
+
+Questions for Amir:
+I am currently dynamically setting the tops of each monthblock based on year-specific data (months are not necesserily evenly spaced. Is there a way to do this with scss?
+Currently the information for each month is being generated as a pure function in the utils file. This information is only used by the month react class to generate internal styling. What is the prefered pattern for this situation?
+
+Check-in:
+Wow I got a LOT done today. Looks like I’ll be able to commit my code tomorrow. All I need to do is add flowtypes and I think I should be good. Of course, there will be tons I need to change from the first CR.
+I also need to install atom and nuclide in order to use flow better.
+
+
+
+06/27/17 -
+
+Things I need to do for YearCalender:
+Have a common constants and types file
+Seperate the rule_type types into own type definition
+Separate the dayCalendarView types into own type definition
+Populate the empty days in buildCalendarModel instead of weeks
+Verify that there are no repeats in buildCalendarModel instead of weeks.
+
+
+
+06/29/17 -
+
+Goals:
+Submit YearCalendar for codereview again
+Maybe whip up another mini bug report in the mean time?
+Fix all changes needed once I get the CR back
+
+
+Things needed before I submit YearCalender:
+Add test for unsuccessful completion of buildCalendar (DONE)
+Update dayarray tests (DONE)
+Update yearcalendar tests (DONE)
+Change maps to _.maps
+Change mouseover behaviour of entire element (DONE)
+Add feature flag for YearCalendar (DONE)
+Break apart getFormattedDate/fix switch statements (DONE)
+Have a common constants and types in a shared place
+Split up code heirarchy so it’s less flat.
+Figure out better solution to population of default days (DONE)
+
+Where I’m at:
+Got the code review in! Woot! Feel very good about that. Next things up are to:
+Put each subcomponent into its own file
+Rename each subcomponent
+Rename DayArray to year
+
+
+
+
+
+06/30/17 -
+
+
+Goals:
+Put each subcomponent into its own file
+Get colors from main color variables stylesheet
+Redo flexboxing so that headers are in same flexbox as children.
+Rename each subcomponent
+Rename DayArray to year
+Put globablly used calendar things into their own top-level folder
+
+
+How do I make a package?
+Index.js has a require(‘entry-dynamic’) that tells blaze what to do
+Entry-client imports a bunch of stuff. Not exactly sure what/why it imports stuff
+
+
+
+
+
+
+07/05/17 -
+
+I’ve been trying ot get the text input of triggers to autoselect on start. This is proving really really hard to do.
+
+
+
+07/06/17 -
+
+Goal - Make it so that an editable text will auto-focus and auto-select when given an autoselect prop.
+
+Problem: I am not able to get the first focus event, which is required if I want to select all the text in the box. I am adding logic in componentDidMount to fire a focus event, but it doesn’t seem to be firing.
+
+Hypotheses:
+Textinput exists but isn’t actually rendered at the time that componentDidMount is called. This means that when a focus is called/dom stuff is changed, its not actually making those changes.
+I can test this by trying to set the text to be bold on componentDidMount, and seeing if that works.
+A re-render is being triggered after componentDidMount which causes the focus event in componentDidMount to get lost.
+I can test this by seeing how and when the re-renders happen.
+Result: render happens and then component is mounted, which seems to be correct.
+Hypothesis: there is another component with autoFocus
+
+Okay so I couldn’t get autofocusing working. It came down to that I would set a react input with the autoFocus attribute, and the input in html would not have that attribute. Not sure why.
+
+Goals:
+Make a dummy isWorkingDay field that always returns true. Verify it works with analytics.
+jonah:
+very silly question
+for some reason I got logged out of my localhost tulip instance
+what's the username/pass
+
+boorstin:
+sysadmin@tulip.co, admin
+
+Metrics:
+
+What does the getMetricTree() function do?
+What does postgresfields do?
+
+What does the data object passed to getDataLabel do?
+
+Where I’m at - Moving shared utils and models from year-calendar to year-calendar-model. Maybe this should be calle something like SchedulingUtils. Not sure. Anyways, my tests are failing for some reason I can’t figure out right now.
+
+
+
+07/07/17 -
+
+Goal: get query working for weekdays. Understand how the other querys work
+
+
+Postgres:
+
+States_processes is the table I want to selet from
+
+Does the to Postgres function append anything to the sql statement we give it?
+
+Array_agg - aggregates input into an array
+
+How do I evaluate sql snippets?
+Prepend with select
+
+What do commas do?
+
+Why does unnest(array_agg(TRUE)) from our table return a row rather than just one element?https://shop.learncodethehardway.org/paid/sql/ex7.html
+
+Where I’m at - in the middle of a sql course. Going good so far
+https://shop.learncodethehardway.org/paid/sql/ex7.html
+
+
+
+07/10/17 -
+
+Goals:
+Add created-by/created-date info to process and analytics schema
+Complete SQL the hard way
+Create a document outlining how I want the SQL logic of analytics filtering to work.
+
+
+SQL as understood by sqlite:
+
+Create table -
+Inside an sql file, How do I specify the database in which the table is created?
+What is a temp database used for?
+What is the ‘main’ database? How is it set?
+What is a collation sequence? How is it set?
+What do check and foreign key constraints do?
+What is a without rowid table?
+Primary Key
+Can only have one
+Can be null due to legacy reasons
+I think this indexes the table. Not sure what else this does
+Unique
+Says that the values of a unique row are unique.
+Check
+Each time a new row is inserted into the table or an existing row is updated, the expression assosciated with the check constraint is evaluated and cast into a numeric value.
+Rowid
+All sqlite tables have an int key that identifies the row within its table
+Using rowid is twice as fast as using a primary key or indexed value
+Integer primary keys are actually aliases for rowids!!
+
+Drop Table -
+What are foreign key constraints?
+If there are foreign key constraints, this deletes them implicitly
+
+Insert -
+Can also ‘insert into person (id, name) select (id, first_name) from other_people’
+Delete -
+
+Select -
+
+Update -
+
+REPLACE INTO can also be used in place of INSERT to force a replacement of a row.
+
+Should my hooks be on the client side, server side, or common?
+Should be on server, because we want the server’s timestamps
+
+How do I find an analysis in the database?
+Save it, then look in the URL
+
+Whats the difference between Meteor.users.before.update and Users.before.update
+
+Got a fair amount done. Did a little phab task and did 9 lessons in learn sql the hard way.
+
+Home goals:
+Follow along first 3 lessons of reduxstagram
+(stretch goal) complete 5 lessons of reduxstagram Done!
+
+Why do I need to do props.increment.bind(null, i) instead of props.increment(i)?
+
+
+
+07/11/17 -
+
+Goals:
+Go through code of redux app and create questions for each thing that I don’t understand how it works.
+Try to answer each question.
+Complete up to course 18 for redux tutorial
+Finish learn SQL the hard way.
+
+General to do:
+Close webster account
+Email my sibb
+Get bike fixed
+
+
+Redux Tutorial:
+
+Questions:
+Reduxstagram.js
+How does styl files get loaded by webpack? If I wanted to use scss instead, how would I do that?
+What does the provider do with the store?
+It passes down the store to each container component.
+What does the router do with the history?
+Is the colon a special character in path="/view/:postId" ? Is postId a variable or could I substitute it with and word?
+The colon means that postId is passed down to the assosciated component in its props as match.params.postId
+How do components in react router get their props?
+When a nested route matches, the child is passed to its parent as part of its children prop.
+Store.js
+How does the api of createStore work?
+Args:
+Reducer. Given the previous state tree and an action handle, returns the next state tree.
+Initial state: the initial state of the app. If using combineReducers, must be a plain object w/ same shape as the keys passed into it. Not sure what this means.
+Returns a store object with the following functions:
+getState(): returns the current state tree of your app
+dispatchAction(action): sends an action to the reducer
+subscribe(listener): takes a function that will be called whenever an action is dispatched to the store.
+replaceReducer(reducer): replaces the reducer currently used by the store to calculate state.
+How does syncHistoryWithStore work?
+It lets redux know about the current history.
+App.js
+INSIGHT: App is a container component, main is a presentational component. See section ‘Presentational and Container Components’ in http://redux.js.org/docs/basics/UsageWithReact.html
+Presentational components don’t know about redux
+Container components interface with redux and your presentational components
+How does provider know which components are container components?
+What decides how components are nested?
+The nesting of the route objects determines the nesting of the linked react components.
+What does mapStatetoProps do?
+Turns the redux state tree into read-only props for the presentational components.
+Why do the presentational components have access to more state than just the return of mapStateToProps?
+What does mapDispatchToProps do?
+Abstracts the dispatching of actions away from the presentational components.
+Lets the presentational components call normal event handlers, which dispatch actions to the redux store.
+What is the api of bindActionCreators?
+Takes an object whose values are action creator functions
+Returns an object with the same keys, but the corresponding functions have been wrapped in a dispatch call.
+Wraps a dispatch call around each action creator you pass it in.
+This makes it so that presentational components can call resulting function as if it were a regular function, without having to worry about or import the dispatch function.
+What is the api of connect?
+Takes a mapStateToProps function
+Takes a mapDispatchToProps function
+Takes a presentational component
+Returns a container component that wraps the presentational component.
+Main.js
+What does React.cloneElement do?
+Clones an element and merges the props passed in shallowly.
+Why are we using React.cloneElement here?
+Photo.js
+What does the figure tag do?
+A figure like in latex.
+Not specific to a certain position in the DOM.
+What is the CSS transition group API?
+Child: element to be animated
+transitionName: suffix appended to transitions in css
+transitionEnterTImeout: how long in ms to have transitionName-enter class be activate
+transitionLeaveTimeout: how long in ms to have transitionName-leave class be active.How does a
+Why is the key of the span post.likes? Aren’t these non-unique?
+What is the figcaption tag?
+A caption of the assosciated figure
+Why do we have to call props.increment.bind(null, i) instead of props.increment(i)?
+reducers/posts.js
+How does posts only get the current posts, and not any other parts of the state?
+
+
+Raven:
+Seems like a super useful api for tracking bugs in production apps
+I wonder how to set different tags for production vs build environments.
+Initialize -
+    Raven.config(sentry_ur, {
+        Tags: {
+            Random_tag: ‘jonah’
+        }
+    }).install
+This will start raven getting your error messages, and will sort them by the tags object. Random tag could be a git commit, user authority level, or anything else.
+Show report dialog -
+    Raven.captureMessage(‘Something bad happened!’);
+    Raven.showReportDialog();
+This will show a dialog to the user with which to easily get info about what went wrong.
+
+
+Sublime Tips -
+Ctrl + shifts + g -> emmet wrap with tag
+
+Express:
+https://scotch.io/tutorials/routing-react-apps-the-complete-guide
+What does dev-tool: ‘source-map’ do?
+What does the entry field do?
+What does output.path actually do?
+WHat does output.publicPath mean?
+
+Redux Async:
+http://redux.js.org/docs/advanced/AsyncActions.html
+https://engineering.haus.com/connecting-redux-to-your-api-eac51ad9ff89
+Request metadata should be kept in the store so we can display proper info to the user when doing a request/if something goes wrong
+It’s not unanimously agreed that you should keep your backend data in the store.
+Heroku made something called React refetch which is a store explicitly for data from the backend, which leaves redux to only deal with client-side interaction only.
+How to get data into the store
+Imperative approach
+Have an asynchronous task that fetches data from the backend.
+The task knows when to update the data and metadata in the store and dispatches actions to do so at the appropriate times
+You can do this with the thunk middleware.
+Declarative
+Ex: redux-saga, redux-loop,
+What is the difference between redux-sag and redux-thunk?
+Structure
+What is state normalization?
+Flattens the data by id and resource type
+Why do normalization?
+
+What is axios?
+Performs http requrests
+Why use it over fetch?
+
+
+
+07/12/17 -
+
+Goals:
+Make django rest API for bandmate
+
+Why do new virtual environments come with extra packages?
+Because my pythonpath was already set
+
+What does the CreateView class do?
+Why does PostSerializer need a Meta class?
+How does the urlpatterns work?
+What is format_suffix_patterns?
+What does the related_name of a foriegnkey mean?
+What does the on_delet=models.cascade in a foreignkey do?
+
+Ctrl + shift + up arrow = move line up in sublime
+
+Getting the following errors on my unit tests:
+Traceback (most recent call last):
+  File "/home/jspear/Documents/Bandmate/server/api/tests.py", line 66, in test_api_can_update_a_post
+    reverse('details', kwargs={'pk', post.id}),
+  File "/home/jspear/.virtualenvs/bandmate/lib/python3.4/site-packages/django/urls/base.py", line 91, in reverse
+    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
+TypeError: _reverse_with_prefix() argument after ** must be a mapping, not set
+
+I was using the following syntax for reverse:
+reverse('details', kwargs={'pk', post.id})
+When I should have been using
+reverse('details', kwargs={'pk': post.id})
+(colon instead of a comma)
+
+07/14/17 -
+
+Todo:
+Non-work related:
+Get haircut
+Get bike part
+Create iphone cord spool prototype
+Create ipad holder prototype
+Get onepass set up
+Order dell battery
+Get new battery for car
+Cancel webster account
+Work related:
+Add sample queries to CR
+Create scheduling proejct where I lay out the following tasks
+Document the differences between rule-types, dayViewStyling,
+Auto scroll to right width
+Set up backend
+Create mocks for backend
+Do 20px change
+Figure out why jest tests aren’t working
+Figure out negative clause for fixed day rule queries
+Change week parameter to better name
+Meet with mason
+Put book back
+Bring home wrench
+
+Schedule:
+12:00-12:20 - Order dell battery
+12:20 - 1:00 - Decide on password management/set it up
+1:00   - 1:15 - Meet with mason/Figure out better naming for week parameter/Talk about if we should remove allDay field
+1:15   - 1:30 - Add Sample queries to CR
+1:30  -  1:45 - change week parameter to whatever name we decide on
+1:45  -  2:30 - Figure out negative clause for fixed day rule queries
+2:30  -  3:00 - Figure out why jest tests aren’t working
+3:00  -  3:30 - Do 20px change
+3:30  -  4:30 - Create iphone cord spool prototype
+4:30  -  4:35 - Put wrench/Drywall screws/possibly automatic screwdriver in bag
+4:35  -  4:40 - Put book back
+4:30  -  5:30 - Create ipad holder prototype
+5:30  -  6:30 - Get Haircut
+6:30  -  7:00 - Go back home
+7:00  -  8:00 - Gym
+8:00  - Onward - Free
+
+
+07/17/17 -
+
+Todo:
+Non-work related:
+Get bike parts
+Sign up for summer hummer
+Cancel webster account
+Bring bak wrench
+Bring back hacksaw
+Finish ipad Print
+Work related:
+Create scheduling proejct where I lay out the following tasks
+Document the differences between rule-types, dayViewStyling,
+Auto scroll to right width
+Set up backend
+Create mocks for backend
+Update names of dayViewStyling and week# for Scheduling
+Do 20px change
+Do adding analytics to end change
+Figure out why jest tests aren’t working
+
+
+
+
+Schedule:
+12:25 - 1:00: 20px fix
+1:00 - 2:00 add analytics to end of correct column
+2:00 - 3:00 when saving a copy of an analytic, add it to the end of the column.
+3:00 - 4:00 Finish 3D Print
+3:45 - 4:45:  when saving a copy of an analytic, add it to the end of the column.
+
+
+
+When Runnign arc diff I get the following message:
+
+Some linters failed:
+    - CommandException: Command failed with error #127!
+      COMMAND
+      sh -c '(source ./scripts/setPaths.source.sh && node ./environments/cloud/Central/factory/scripts/arc-flow.js ./environments/cloud/Central/factory "$0")' 'environments/cloud/Central/factory/imports/step-editor-core/client/StepEditorClientUtils/StepEditorClientUtilsMisc.jest.js'
+
+      STDOUT
+      (empty)
+
+      STDERR
+      environments/cloud/Central/factory/imports/step-editor-core/client/StepEditorClientUtils/StepEditorClientUtilsMisc.jest.js: 1: environments/cloud/Central/factory/imports/step-editor-core/client/StepEditorClientUtils/StepEditorClientUtilsMisc.jest.js: source: not found
+
+(Run with `--trace` for a full exception trace.)
+
+What’s the deal?
+
+ANSWER: fuzzy made an error in the new flow checking script. Basically, he used the sh command which was aliased to bash on most systems, but it wasn’t on mine so it failed.
+
+
+
+
+
+
+07/18/17 -
+
+
+
+
+How do I get the last N working days iteratively using the fancy count method?
+
+What are the places where you can add a new analytic?
+
+Why does adding a new analytic, rather than an existing one, navigate us to the top of the page?
+
+Where does new analytics add items?
+
+What’s up with this:
+Exception while simulating the effect of invoking 'masonryGridAddItemToTheseDashboards' TypeError: Cannot read property 'columns' of undefined
+    at MasonryGrid.addItem (MasonryGrid.js:108)
+    at _lodash2.default.each.instance (methods.js:74)
+    at arrayEach (vendor.dll.js?hash=ec75a29…:17264)
+    at Function.forEach (vendor.dll.js?hash=ec75a29…:26086)
+    at DDPCommon.MethodInvocation.masonryGridAddItemToTheseDashboards (methods.js:72)
+    at livedata_connection.js:859
+    at Meteor.EnvironmentVariable.withValue (meteor.js?hash=27829e9…:1077)
+    at Connection.apply (livedata_connection.js:850)
+    at Connection.call (livedata_connection.js:725)
+    at Object.save (analysis.js:907) TypeError: Cannot read property 'columns' of undefined
+    at MasonryGrid.addItem (http://localhost:8088/build/bundle.js:17033:24)
+    at _lodash2.default.each.instance (http://localhost:8088/build/bundle.js:85920:12)
+    at arrayEach (http://localhost:8088/app/client/webpack-bundle/vendor.dll.js?hash=ec75a29501744a2054a5796a168fcb7f274bb7ad:17264:11)
+    at Function.forEach (http://localhost:8088/app/client/webpack-bundle/vendor.dll.js?hash=ec75a29501744a2054a5796a168fcb7f274bb7ad:26086:14)
+    at DDPCommon.MethodInvocation.masonryGridAddItemToTheseDashboards (http://localhost:8088/build/bundle.js:85918:22)
+    at http://localhost:8088/packages/ddp-client.js?hash=4f70774d9d167cd4ce436b791adb8909a36a7f96:4076:25
+    at Meteor.EnvironmentVariable.withValue (http://localhost:8088/packages/meteor.js?hash=27829e936d09beae3149ecfbf3332c42ccb1596f:1077:17)
+    at Connection.apply (http://localhost:8088/packages/ddp-client.js?hash=4f70774d9d167cd4ce436b791adb8909a36a7f96:4067:54)
+    at Connection.call (http://localhost:8088/packages/ddp-client.js?hash=4f70774d9d167cd4ce436b791adb8909a36a7f96:3948:17)
+    at Object.save (http://localhost:8088/build/bundle.js:10702:28)
+
+
+Why is home_dashboard_add_analysis in old analytics? What about this is analytic version specific? What does home_dashboard_add_analysis even do?
+I think this is the modal that comes up whenever you click the ‘add chart’ button
+
+Mulch t
+
+To add rsa key:
+
+Ssh-add ~/.ssh/path
+
+psql -h jonah-benchmarking-nb-restore.citcrxuv83s8zonaws.com -d factory -U factory
+
+Find password by looking in: ~/targets/newbalance/conf.json
+
+
+
+07/19/17 -
+
+What I’m thinking about:
+
+Optimizing Queries
+Create a subtable and select from that
+Timing raw count on its own
+moving query to where clause
+Using 3rd method:
+Create a table with date-times from states, filter by isWorkingDay, sort descending and choose a limit. Then check that your start time is in that table
+
+To mount to the deploy server write:
+    Sshfs ubuntu@deploy.tulip.co:/home/ubuntu/jonah ./deploy_server
+    Do from outside the folder you’re mounting
+    Sshfs stands for ssh file system
+
+
+What is states vs states_processes?
+
+
+
+07/21/17 -
+
+To Do:
+Make Intern WIP Slide
+Figure out why benchmarking queries aren’t returning the same thing
+Message everyone and expain plain for today
+Call dad to say hi, explain cell phone situation, get info and prices on room
+Call PineStead and set up reservation
+Edit feature flag of workingDays to say that it’s not ready for development.
+Optional To Do:
+Order New Cell Phone
+Cancel Webster Account
+Call PayPal and figure out stuff
+
+Figuring out why benchmarking queries aren’t working:
+For method two, the query isn’t filtering anything. Why not?
+Probably because there’s no completions happening on the weekends
+SOLVED ISSUE: I have to cast all of the timezone thing sto date if I compare them to a date
+There is a difference of 2674 between query 1 (10 days) and query 2 (10 days).
+When I add an AND NOT to see all of the things selected by query 1 not selected by query 2, I’m getting 25776 elements.
+This issue was in query 1, the or clauses were not surrounded by parenthesis, so we were getting a lot of extra stuff
+AWESOME! Basically by wrapping the timezones in parenthesis and explicitly converting to date, I was able to make methods 1 and 2 return the same results. Now, I just have to fix the issue that method 3 is not returning anything except for over the last year.
+
+SOLVED ISSUE: the table query was returning the first ten elements of the time series rather than the last 10. To fight this, I switched the start and end date of the generate-series, and I made the interval -1 day
+
+ISSUE: I’m the query is still returning th ewrong number of elements:
+SOLVED: I was going backwards in time, but I should have been going forwards.
+
+ISSUE; the query still have the wrong count.
+To fix this I want to see what days my subquery is selecting, but I don’t know how to do that without doing a join, which is making shit act weird.
+
+Make sure to include link to script
+Give brief overview of different options
+Methodology
+Raw results
+Interpretation of results
+
+Postgres benchmarking folder in drive
+
+Baseline Count(*) Query takes 0.506536960602 s
+Last N Days  Method 1          Method 2                Method 3
+-------------      --------------        --------------               ----------
+           10  0.931397914886  0.601185083389     1.04251
+           30  1.67930793762    0.628777980804     1.04952
+           90  3.92905402184    0.735037088394     1.08868
+          360  -                           -                               1.13941
+
+
+Goal: get Method 3 within 0.1 seconds of Method 2.
+
+I think I can use a few joins instead of looking in the innter query. I also think I can somehow get rid of the inner select.
+
+Speed is dramatically reduced if I am able to move the inner query to the outer query
+
+
+Yay I made method 3 better than method 2!
+
+Baseline Count(*) Query takes 0.506876945496 s
+  Last N Days  Method 1        Method 2          Method 3
+-------------  --------------  --------------  ----------
+           10  0.932319879532  0.602313041687    0.58505
+           30  1.63665413857   0.627398014069    0.591565
+           90  4.0363650322    0.75369811058     0.629342
+          360  -               -                 0.70647
+
+
+Where I’m at:
+I got the queries all returning the same thing! I also was able to optimize the 3rd query so its the fastest. I’m in the middle of writing a markdown file specifying how to run the tests.
+
+
+07/24/17 -
+
+How to kill all jest processes?
+https://pathtogeek.com/how-to-kill-results-from-ps-grep
+
+$ ps aux | grep conky | grep -v grep | awk '{print $2}' | xargs kill
+
+Grep -v grep gets grep results besides that of grep itself
+What does awk '{print $2}' do?
+Prints the 2nd entry in each row
+
+
+git diff master --name-only | grep analytics | xargs git rm
+07/25/17 -
+
+Should I move code restructuring to its own diff?
+
+I want to make a new branch featuring changes only on some files
+http://jasonrudolph.com/blog/2009/02/25/git-tip-how-to-merge-specific-files-from-another-branch/
+
+How to see the names of the changed files?
+ANSWER: git diff --name-only
+
+Okay now I have a list of all changed files. I want to get all the ones that don’t have ‘analytics’ in their name:
+I can pip the result of the diff to grep -v analytics
+
+
+How do I pipe the results of what I’ve got to a git checkout?
+https://stackoverflow.com/questions/35362525/pipe-git-diff-to-git-checkout
+Use unix xargs
+What is xargs?
+https://unix.stackexchange.com/questions/24954/when-is-xargs-needed
+Takes stuff from stdout and turns them into arguments for commands. Some things, such as grep expect stuff to be in stdout, so work fine. Other things, such as touch, require the stuff to be in as arguments
+
+When I run:
+git diff workingDaysScrollToCurrentMonth --name-only | grep -v analytics | xargs git checkout workingDaysScrollToCurrentMonth
+I get the following errors:
+error: pathspec 'environments/cloud/Central/factory/imports/admin/client/react/WorkingDays/mockData.js' did not match any file(s) known to git.
+error: pathspec 'environments/cloud/Central/factory/imports/year-calendar/client/constants.js' did not match any file(s) known to git.
+error: pathspec 'environments/cloud/Central/factory/imports/year-calendar/client/types.js.flow' did not match any file(s) known to git.
+
+I have discovered that these are the files that have been deleted. Checkout is only getting files that are new/changed. How do I checkout changes to deleted files?
+
+git diff master --name-only | grep analytics | xargs git rm
+
+07/26/17 -
+
+
+Getting AutoCompletions for shell aliases:
+Why don’t aliases auto complete correctly?
+How to fix?
+https://stackoverflow.com/questions/342969/how-do-i-get-bash-completion-to-work-with-aliases
+https://brbsix.github.io/2015/11/23/perform-tab-completion-for-aliases-in-bash/
+What is dpkg?
+Package manager for debian
+What is dpkg -L?
+I’m guessing it lists all packages
+How to use man to only get info related to a specific flag?
+
+Git merge what do <<<<, ==== and >>> mean
+https://wincent.com/wiki/Understanding_Git_conflict_markers
+
+
+
+
+07/28/17 -
+
+Goals:
+Commit both diffs related to yearcalendar
+Merge changes
+Understand Mark’s code
+Make everything work using redux
+
+Question:
+I have two branches, changeYear and scroll. Changeyear branched off of scroll, to continue working on a few features. Since then, I have added a commit or two to scroll (as part of code review), and pushed it to master. I want to add these commits to changeYear as well
+Wrinkle two: arc land squashed all of my commits into one commit. I want that one commit to replace the many intermediate commits that exists in changeYear.
+Master’s latest comit (994773b) contains all the commits in changeYear up to a certain point.
+
+SOLUTION:
+Git rebase -i, delete all lines corresponding to commits from other branch. Potentially squash commits together.
+After the -i screen the fix any merge issues.
+
+What is tig?
+Basically a tool to look at commits and see what changse were in each
+
+
+07/31/17 -
+
+
+To Do:
+Make phab changes for “convert state management to redux”
+Make a diff with small changes I’ve learned from debugging, including:
+Check if currentYear is null in firstDayofYear and throw error if it is
+In all my error messages try to print a stacktrace, or something simmilar
+Change error_message from day_view_styes
+Change status to a boolean called isWorkingDay
+Make all
+Look into if we can get an arclint thing that says no trailing slash in import directory.
+https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/extensions.md
+Look into if we can get an arclint plugign that syas no leading slash in any import statement.
+Finish addModal:
+Create modal UI in react
+Link modal UI to actually doing behaviour, creating a calendar
+Talk to sam about using createSubscribingContainer rather than createContainer
+
+How to check if state is falsy but not 0?
+
+How do I make saving the modal work in redux?
+
+What is up with these:
+
+
+
+Completed: Seperate smart and dumb modal components. Make checking and unchecking work for modal.
+Next:  1: Populate initial weekdays modal info with data from the db. 2: Use the final statuses of the radio buttons to update the data in the database.
+08/01/17 -
+
+Goals:
+Make it so that my screens automatically work on startup
+Look into automatically arranging my windows on startup
+https://askubuntu.com/questions/621721/is-there-a-script-or-software-to-open-an-application-window-on-a-specific-view
+Research command line shortcuts
+Figure out of non-managed component is antipattern (ask what mason thinks).
+If not, turn my managed inputs into non-managed inputs.
+Figure out what to call the name tag. Id or identifier or something else (ask mason)
+Populate initial weekday modal info with data from the database
+Use the final statuses of the radio buttons to update the data in the database
+
+
+
+Command Line Shortcuts:
+Ctrl + k deletes everything from cursor to end
+Ctrl + w deletes the word before the cursor only
+!! represents last command you run
+Sudo !! will run the last command with sudo privledges
+!cat will run the last comand that used cat
+!cat:p will show you instead the last command that used cat. You can then press !! to run it
+!$ represents the arguments from the last command
+History will show you a bunch of commands
+You can do !<line_number> to run that command
+Expansions can be used to run a command with the same arguments, with only the parts in braces changed
+EX: instead of typing mv /path/to/file.txt /path/to/file.xml
+You can write mv /path/to/file.{txt,xml}
+
+Whats the difference between bin and sbin?
+http://blog.taylormcgann.com/2014/04/11/difference-bin-sbin/
+Sbin refers to system binaries
+
+Why do I have to use sudo to run update-monitor-position?
+You can check permissions by running ls -l
+The first thing ‘-rw-r--r--’ means that root has read write, admins have read, and regular users have read
+How do I give regular users execute permissions?
+chmod +x
+What does chmod +x do?
+Chmod +x gives everyone executabel permission
+Chmod u+x gives only the owner of that file the execution permissions
+How do I run a command on startup?
+Add it to startup applications gui
+
+$T.collection(‘Calendars’).find().fetch() gets the calendars collection in the chrome console
+
+TASK: Figure out why I’m creating a new db each time I start the page
+
+My component is getting rendered twice:
+Once when the store has not yet been synced with the database
+Another time when the store has been
+
+At constructor time, the db has not been synced with the store?
+
+When does the database get synced with the store and what causes this to happen?
+
+Because I’m checking whether the calendar object exists, and creating it if it hasn’t, I’m creating it when it shouldn’t be. I should be creating the data server side via a migration.
+
+Why is Modal not recieving calendarRules correctly.
+I needed to update the state in componentWillRecieveProps
+
+Where I’m at:
+Big milestone today. I actually got the modal changing the db state. Pretty exciting. Right now, it’s only working for weekday items (and will wipe any other calendar items that it sees).
+
+
+
+08/02/17 -
+
+Goals:
+Decide if I want to use an external toggler.
+If so, read the code to ensure code quality
+If so, update our code to use it
+Figure out why there is now a lag when there wasn’t one or two diffs ago
+It was because The yearCalendar was initially being rendered before the database data was available. I added a loader that will show until the db info is there.
+Populate initial holiday modal info with data from the database
+Use the final statuses of the holiday radio buttons to update the data in the database
+Remove WorkingDaysContainer if it still has no purpose
+Prettify the modal
+Possibly convert to redux
+Transform all strings to enums
+Navigate to current year
+Clean up the code
+Write migration to put this in everyone’s collection
+
+Where I’m at:
+I was trying to fix a flow error - running into an issue i cant fix. Flow sucks sometimes
+
+WHy am I getting the following error:
+PropType is defined but prop is never used
+This is a known bug:
+https://github.com/yannickcr/eslint-plugin-react/issues/885
+
+08/03/17 -
+
+Goals:
+
+
+Clean up the code
+navigate to current year whenever the page is opened
+Don’t Scroll to current day when we update the rules
+Remove redux code that is no longer being used and container
+Write a migration to put initial pasted calendar rules in db
+Convert function syntax styles
+Push a diff
+Pick up where I left off for analytics. Write the last N working days bulder
+
+
+
+
+Backlog:
+Prettify the modal
+Possibly convert to redux
+Transform all strings to enums
+Write migration to put this in everyone’s collection
+
+How is the database info stored with regards to version control? Related? Unrelated? Completely unrelated? When I make a db change, I don’t see a change in my git log, but I assume there is some notion of different database information between different branches.
+
+How do I make it so that curly braces are automatically initialized with two spaces
+
+
+To run eslint with fixing stuff automatically:
+eslint --rulesdir "./tools/eslint-rules/lib/rules" environments/cloud/Central/factory/imports/analytics/builder/analysis.js --fix
+
+groupingsString
+
+
+08/04/17 -
+
+Debugging-
+
+On good case-
+Index or name is ‘metric’
+Value to serach for is ‘name’
+typeDefinition.inputs contains the value {name: metric }
+
+How do I arc land from a remote branch?
+ANSWER: arc land --onto master
+
+Where I”m at -
+The analytics engine expects the first argument to be a metric. I need to make it so that the first argument can be a value
+
+
+08/07/17 -
+
+Things to do -
+Make changes to CR D1029
+Submitted comments. Waiting on mason to reply to some questions first.
+Make it so first input of a function does not need to be a metric
+Finish state of Tulip slides
+
+#2:
+
+What I’m noticing -
+Getting the following error -
+Uncaught TypeError: Cannot read property 'getFieldOrFunctionType' of undefined
+    at _lodash2.default.filter.f (analysis.js:584)
+    at arrayFilter (vendor.dll.js?hash=578add5c34cacf9d7b2739beb26ba4d62b486738:4143)
+    at Function.filter (vendor.dll.js?hash=578add5c34cacf9d7b2739beb26ba4d62b486738:12730)
+    at Object.getFunctionFiltersByMetricName (analysis.js:583)
+    at getDateRangeFromAnalysis (getDateRangeFromAnalysis.js:32)
+    at Object.summary (dateRange.js:87)
+    at _lodash2.default.map.editor (analyticsReducers.js:58)
+    at arrayMap (vendor.dll.js?hash=578add5c34cacf9d7b2739beb26ba4d62b486738:4200)
+    at Function.map (vendor.dll.js?hash=578add5c34cacf9d7b2739beb26ba4d62b486738:13111)
+    at buildEditorSummaries (analyticsReducers.js:55)
+
+
+Okay so right now the last_n_working_days thing is showing up but it’s not doing anything. Next step is to see what should be happenning when I click on it, and find out why that call is being made
+
+For now I”m going to make an eslint rule.
+
+Okay so I made two eslint rules -
+One for trailing slashes
+One for leading slashes
+Another cool one would be requiring a space between imports/ and other modules
+08/08/17 -
+
+Cool! Just landed my two eslint rules. Overall, making them was not as bad as I think.
+
+What I need to do today is figured out why last_n_working_days isn’t accepting input.
+
+Okay. I just spend a time making the unused function linter.
+
+To run:
+
+/home/jspear/Tulip/tulip/environments/cloud/Central/factory/node_modules/eslint/bin/eslint.js  --rulesdir ./tools/eslint-rules/lib/rules  environments/cloud/Central/factory/imports/year-calendar | grep 'no-globally-unused-funcs'
+
+To get timing info (you have to be in Tulip/tulip:
+
+TIMING=1__/home/jspear/Tulip/tulip/environments/cloud/Central/factory/node_modules/eslint/bin/eslint.js  --rulesdir ./tools/eslint-rules/lib/rules  environments/cloud/Central/factory/imports/year-calendar
+
+THe rule takes roughly 33% of the execution time for the year-calendar folder
+
+Output when running on everything:
+
+Rule                            | Time (ms) | Relative
+:-------------------------------|----------:|--------:
+no-globally-unused-funcs        | 74171.560 |    61.6%
+import/namespace                |  7384.590 |     6.1%
+max-len                         |  1613.721 |     1.3%
+react/display-name              |  1572.313 |     1.3%
+indent                          |  1530.719 |     1.3%
+react/no-string-refs            |  1498.315 |     1.2%
+react/prop-types                |  1444.801 |     1.2%
+react/no-unused-prop-types      |  1437.389 |     1.2%
+react/no-deprecated             |  1395.923 |     1.2%
+react/prefer-stateless-function |  1339.987 |     1.1%
+
+Major todos for project:
+Write migration
+FInish analysis ui and debugging
+Get modal CR in
+
+08/09/17 -
+
+Questions for mason:
+Why does passing in functions, rather than anonymous functions that call that function violate the abstraction?
+The higher components are not using the ui events
+This is a common pattern in the codebase
+Wrapping it in an anonymous function is harder to read and makes debugging harder
+I don’t understand the call in all_calendars comment
+
+
+TODO:
+Change functions to wrapped in arrow functions
+
+Okay just did all the refactoring. Took about as long as I thought.
+
+
+https://stackoverflow.com/questions/28400727/from-node-js-which-is-faster-shell-grep-or-fs-readfile
+
+
+Rule
+Time (ms)
+Relative
+no-globally-unused-funcs
+94379.706
+67.7%
+
+
+import/namespace
+7161.583
+5.1%
+
+
+react/display-name
+1623.720
+1.2%
+
+
+max-len
+1619.751
+1.2%
+
+
+indent
+1587.714
+1.1%
+
+
+react/no-string-refs
+1465.861
+1.1%
+
+
+
+08/10/17 -
+
+I’m trying to debug why using Scheduling.calendarRules instead of Scheduling.mockRules is breaking the code.
+
+The reason is because the calendarRules are all non-working ones, because when we only are adding rules that cause days not to be working days to the calendar. Right now, there is no capability to add defaults that are ON.
+
+Backlog:
+Change fixed day stuff in analytics to reference floating days
+
+If a day falls on a saturday -> observed previous friday
+Need to add logic for new years
+
+This issue is that we’re also going to the next year even when new years is not on that day. We only get an error on 2022 because its  a sunday and thus a rule is being inserted.
+
+
+
+08/11/17 -
+
+
+What I want to do today -
+Add ability to change status of working and non-working days on the calendar.
+
+
+Add ability to change status of working and non-working days on the calendar:
+Pass in an addRule function to yearCalendar that will be called by dayItem. For now, add a fixed day rule when a button is clicked. The fixed day rule will be a default day NOT_RUNNING rule.
+TEST: see if the reloading of the page looks weird or is fine.
+Potential problem: How the modal works currently is that it is the sole source of truth of the rules (I believe). We may have to add a seperate list to Calendar called calendar_rules_local, with the new rules that are being added
+
+08/17/17 -
+
+
+Where I’m at (start of day) -
+Tomorrow I need to do the tulip presentation, so I want to finish that tonight
+I also want to be able to edit the calendar on click. So far things are crashing really badly and I don’t know why.
+
+Okay so I found out that my rule I was building was badly formatted. Now, it works!
+
+Next things to do:
+Dont reset all rules when reloading the modal.
+Toggle rule type depending on what the current status of the day is
+Add optional year parameter to FIXED_DAY rules.
+Make workingDays pane work when calendar is empty.
+Make modal prettier
+
+How to make global reconcilliation work -
+Get all global rules.
+
+Adding rules logic ->
+If there is nothing there, add an override rule of the opposite top-level status
+If there is a holiday, add an override
+
+If the rule would be rendered the same without the rule, remove it.
+
+Where I’m at now -
+Halfway moving day toggling to redux. I’m still figuring out in my head what the expected behaviour of the clicking should be. There are some funny edge cases having to do with clicking the day, and then changing the default rule. Ideally, when toggling through a rule, it will remove itself if we go all the way back to the start.
+
+Now I need to rebase filterWorkingDays on master, which requires me making changes to allow for usages of floating days
+
+Why is minimongo not up to date with mongo?
+
+Update phab ticket
+
+
+
+
+08/18/17 -
+
+
+Super important:
+ - Documentation
+Fairly important:
+ - Finish up and merge D1131
+Nice to have:
+ - Toggling rules on/off
+ - Separate React node for analytics
+ - Migration
+
+
+Something that monitors the states of a thing and automatically creates snapshot tests for it by looking at all the values it takes on during normal execution.
+
+Create a new ticket for the react bugs
+
+Update ticket for segfault bug
+
+ToDo:
+Fix all_calendars subscription name
+Do CR for analytics stuff
+Emit calendar updating event
+Sort holiday modal contents
+Submit a CR for refactoring metrics.js / adding unit tests
+
+Just added fixedRules and fixedObservedRules to query builder.
+Encountering an error where fixedObsvdQueries is not working correctly. I’m going to debug further/look for patterns.
+
+What I’m testing -
+Is tomorrowIsWeekendHoliday returning true only when tomorrow is a weekend holday?
+Observations
+December 22, 2016 is returning false, but it should be null
+December 23, 2016 is returning true, but it should be null
+December 24/25, 2016 is returning false, but it should be null,
+December 26, 2016 is returning false, but it should be true
+Hypothesis: todayIsFriday is the only thing being checked. Null AND true is returning true.
+Result: I returned ‘Null and todayIsFriday’ and I got the same result. I should have gotten all trues. This means that the and is not working
+Figured out the issue: FALSE AND NULL is equal to false. I need to convert my false to null first.
+
+Other Issue-
+Checking if previous day is holiday is working fine.
+Checking if previous day returns
+todayIsMonday returning true if it monday, null if it is not
+A = null b = null => null
+A = null b = true => null
+A = true b = true => true
+A = true b = null => null
+A = false b = true => false
+A = false, b = null => null
+
+Actually all of yesterdayIsWeekendHoliday is working fine
+tomorrowIsWeekendHoliday is returning false for December 24, 2016
+
+The issue is that tomorrowIsWeekendHoliday is returning false
+
+I want a function that seperates the binary to Ternary
+
+
+Where I’m at -
+Just did a pretty huge refactor of a lot of analytics. Some shit isn’t working - like when I click on stuff to try to add it that doesn’t work. I need to find out why.
+
+We should split up the Metric in the way that makes the most sense. Most of it’s “methods” are just getters for its internal attributes
+
+We should also split up functionMetric and fieldMetric into two seperate classes
+
+Reduce dependency on BuilderUtils
+Dont do shallow equaling using EJSON
+
+
+WHy does input.validate call the validate of the inputDefinition?
+
+I’m getting the following error -
+
+Bind must be called on a function
+
+Where I’m at -
+I just spend all day refactoring and getting Metric, MetricInput, and Validation Result to be ES6 classes and in their own seperate files, with full test coverage. Everything is working except the very last changeset (trying to move Metric to its own file). For some reaosn I’m getting a wierd console error.
+
+
+
+08/20/17 -
+
+
+I’m refactoring Metrics still. Ideally, I want to change the way we pass in input parameters to metrics, to a way that makes more sense. This requires looking at all the places where we create a new Metric, to figure out if there is a good place to cut. One place where Metrics is called strangely is in createNewSingleMetric and createNewMetricMultiple, and since that was strange, I spent the better part of the morning (past 3 hours) creating tests for those functions. It took a while, because it was hard to mock out the Metric dependency (I ended up creating a manual mock for it).
+
+The webpack bundle is at:
+
+/home/jspear/Tulip/tulip/environments/cloud/Central/factory/meteor/.meteor/local/build/programs/server/app/server/webpack-bundle/main.js
+
+I guess it would be good to add tests for registerFunctionType
+A next good thing would be to add flow annotations
+
+
+08/21/17 -
+
+
+Getting an error when I add an aggregation
+
+To test, run script withotu factory running
+
+
+Goal: write a migration
+
+To see git history of a file:
+git log --follow -p -- file
+
+
+IMPORTANT! Analyses is referenced outside of imports/
+
+
+
+08/22/17 -
+
+
+Goals:
+Finish jest unit complaining fix
+Finish aggregations refactor
+
+
+Big insight!
+
+The reason I just cant mock the underlying module is that jest is mocking the outer module, the outer module never gets to call the child module. The solution is in each file that requires mocking of the outer module, to do local mock.
+
+Git add -p is dope
+
+Where I’m at:
+Worked all day on this really cool recap project. I’m in the middle of the second section which is about diffs. I’m working on getting teh time of each commit I’ve done, as well as the line numbers formatted. My current command is:
+ git log --shortstat --author="Jonah" --date=unix --pretty=format:"%ad%x09%s" I need to format the end so I only get the right things
+
+Docker kill $(docker ps -q) kills all docker ids
+
+Git remote add origin <clone ting>
+
+
+I can get just the file lines with:
+
+
+
+
+08/23/17 -
+
+
+TOday I had a meeting with Natan. It was interesting. First, I showed him the calendar, which when honestly less than ideal. I don’t think he was that impressed with it. He asked me “did you guys look at other people’s tools? Why didn’t you go with those?” and I didn’t have an honest answer. It made it worse since I wasn’t a huge fan of the whole project to begin with. Then we talked about what I’d like to do at tulip. I think he want me to work part time - he even offered me to take a year off, do full time and I could get equity. He was really trying to convince me hard, which felt good, but I need to be cautions. As an employer, I 100% see his incentives for trying to get someone like me as much as he can. He needs all the good people he can get at his company. At the same time, I think I have different incentives. I don’t think it makes sense to join the company now, even if I think they were going to be huge. The only reasons I would would be the following:
+THe company is going to be huge and I’m missing out. I looked at the stock options they’re giving out and this seems unlikely (that I’ll make any money off of it.
+The company is going to be huge and I’ll have an awesome experience to share. Coming from a good startup would be good for my career
+I would learn more in a year of working at the startup than I would at school. TBH i don’t htink this is likely.
+So yeah, I don’t think it makes a whole lot of sense to stay here.
+
+I like the data project I’m working on because it could potentially get me a sweet job
+
+
+
+Get the Unix timestamp as well as the comment for each diff.
+git log --author="Jonah" --date=unix --pretty=format:"%ad,%s,"
+How to get just the line’s added #:
+git log --shortstat --author="Jonah" --pretty=tformat:"" | awk '{print $4}'
+
+What I’m trying to do:
+Get in like two good hours of work
+I want to finish the diff section
+First I need to get a way to represent the graph dates
+
+Function signatue will eb something like:
+
+plotCircle(dates, size)
+
+
+
+08/23/17 -
+
+
+
+Skeleton.js
+
+Git remote -v lists remotes
+Git remote set-url <remote-name> <url>

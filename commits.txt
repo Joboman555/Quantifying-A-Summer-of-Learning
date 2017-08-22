@@ -1,0 +1,98 @@
+1503417814	Year Calendar: Enable by default, set experimental to false
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+1503104919	Analytics: Refactor metrics.js
+ 47 files changed, 603 insertions(+), 590 deletions(-)
+
+1503341690	YEAR CALENDAR: Create migration to insert intial year calendar
+ 3 files changed, 2363 insertions(+), 406 deletions(-)
+
+1503093378	Analytics: Add last_n_working days and is_working_day metrics
+ 18 files changed, 1894 insertions(+), 30 deletions(-)
+
+1502998226	Clean up builder_utils
+ 5 files changed, 51 insertions(+), 87 deletions(-)
+
+1502982424	YEAR CALENDAR: Add rule for observed holidays
+ 5 files changed, 153 insertions(+), 5 deletions(-)
+
+1502397224	YEAR CALENDAR: Add support for holidays like christmas/new years
+ 14 files changed, 299 insertions(+), 220 deletions(-)
+
+1502379605	YEAR CALENDAR: Add Modal to change default holidays and working week.
+ 43 files changed, 987 insertions(+), 81 deletions(-)
+
+1502204886	Add esint rule to disallow leading slash when importing from imports dir
+ 1 file changed, 1 deletion(-)
+
+1502143478	Add esint rule to disallow leading slash when importing from imports dir
+ 2 files changed, 45 insertions(+)
+
+1502149614	Add eslint rule to disallow unnecessary trailing slashes on file paths.
+ 2 files changed, 45 insertions(+)
+
+1501869505	Analytics: Remove all automatically fixable linting errors from analytics
+ 134 files changed, 16261 insertions(+), 16430 deletions(-)
+
+1501869158	Revert "Analytics: Remove all automatically fixable linting errors from analytics"
+ 136 files changed, 20982 insertions(+), 20802 deletions(-)
+
+1501815641	Analytics: Remove all automatically fixable linting errors from analytics
+ 136 files changed, 20800 insertions(+), 20980 deletions(-)
+
+1501791463	NEW ANALYTICS: Remove unhelpful title when adding new processes
+ 3 files changed, 19 deletions(-)
+
+1501791333	make new analytics unselectable
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+1501261095	YEAR CALENDAR: Add buttons to change year
+ 3 files changed, 68 insertions(+), 23 deletions(-)
+
+1501258603	YEAR CALENDAR: Automatically Scroll to start of current month working on page open
+ 9 files changed, 65 insertions(+), 25 deletions(-)
+
+1501013910	Move common year-calendar files into top level scheduling directory.
+ 21 files changed, 429 insertions(+), 311 deletions(-)
+
+1500926948	NEW ANALYTICS BUILDER: Remove unused utils functions
+ 8 files changed, 6 insertions(+), 151 deletions(-)
+
+1500315207	Change default offset of pasted widgets to 20px
+ 2 files changed, 17 insertions(+), 13 deletions(-)
+
+1499714494	Add process/analytics creation metadata
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+1498771426	Blur all other text areas when a widget is clicked
+ 1 file changed, 3 insertions(+)
+
+1499274870	(NEW TRIGGERS) Save trigger name automatically
+ 3 files changed, 35 insertions(+), 13 deletions(-)
+
+1499289566	make year-calendar use timezones correctly
+ 6 files changed, 1034 insertions(+), 740 deletions(-)
+
+1499281507	Create YearCalendar React Component
+ 43 files changed, 12540 insertions(+), 39 deletions(-)
+
+1499008876	Make editable button border be the same as the font color
+ 4 files changed, 19 insertions(+), 23 deletions(-)
+
+1498664035	Make admin features enabled by default for all users.
+ 2 files changed, 1 insertion(+), 8 deletions(-)
+
+1497884695	Make dragging analytics easier
+ 7 files changed, 111 insertions(+), 107 deletions(-)
+
+1497380224	Step Editor: Offset pasted widgets.
+ 4 files changed, 428 insertions(+), 71 deletions(-)
+
+1497283860	Fix stepEditorStep input losing cursor
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+1496706989	Step Editor: Double Click Buttons to Edit Them
+ 11 files changed, 579 insertions(+), 59 deletions(-)
+
+1496705824	Enable Copying of Variable Widgets
+ 6 files changed, 287 insertions(+), 30 deletions(-)
