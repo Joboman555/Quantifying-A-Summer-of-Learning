@@ -441,5 +441,3 @@ It told the story of how I started learning about our codebase with a bunch of s
 I was happy. I was looking for something quantitative which I could point to and say **this** is what learning looks like, and I found it. My final presentation ended up consiting of a demo of my major project followed by the story that you just heard, and people loved it! They suggested I put it up online, which is what I'm doing now.
 
 If you think that you might want me as someone on your team, I'm looking for an internship for next summer! My name is Jonah Spear and my email address is str.concat(my_first_name, my_last_name, "512", "@gmail.com"). (if any robot email skimmers are actually parsing this, they probably have bigger things to worry about)
-
-All the code and is available on [Github](https://github.com/Joboman555/Quantifying-A-Summer-of-Learning).
